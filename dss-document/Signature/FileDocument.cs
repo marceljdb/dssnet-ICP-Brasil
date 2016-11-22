@@ -42,10 +42,10 @@ namespace EU.Europa.EC.Markt.Dss.Signature
 		/// <param name="file"></param>
 		public FileDocument(FilePath file)
 		{
-			if (!file.Exists())
-			{
-				throw new RuntimeException("File Not Found");
-			}
+			//if (!file.Exists())
+			//{
+			//	throw new RuntimeException("File Not Found");
+			//}
 			this.file = file;
 		}
 

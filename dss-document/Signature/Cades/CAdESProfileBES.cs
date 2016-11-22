@@ -103,17 +103,13 @@ namespace EU.Europa.EC.Markt.Dss.Signature.Cades
 
         private Attribute MakeSignerIdSpqEtsUriAttrAttribute(string teste)
         {
-           // DerOctetString[] roles = new DerOctetString[1];
-            //roles[0] = new DerOctetString(Sharpen.Runtime.GetBytesForString(teste));
-            return new Attribute(PkcsObjectIdentifiers.IdSpqEtsUri, new DerSet(new PolicyQualifierInfo("http://www.iti.gov.br/images/twiki/URL/pub/Certificacao/DocIcp/docs13082012/DOC-ICP-15.03_-_Versao_6.1.pdf")));
+           return new Attribute(PkcsObjectIdentifiers.IdSpqEtsUri, new DerSet(new PolicyQualifierInfo("http://www.iti.gov.br/images/twiki/URL/pub/Certificacao/DocIcp/docs13082012/DOC-ICP-15.03_-_Versao_6.1.pdf")));
         }
 
 
-        //internal virtual IDictionary<DerObjectIdentifier, Asn1Encodable> GetSignedAttributes
         internal virtual IDictionary GetSignedAttributes
             (SignatureParameters parameters)
         {
-            //IDictionary<DerObjectIdentifier, Asn1Encodable> signedAttrs = new Dictionary<DerObjectIdentifier            
             IDictionary signedAttrs = new Dictionary<DerObjectIdentifier
                 , Asn1Encodable>();
             Attribute signingCertificateReference = MakeSigningCertificateAttribute(parameters
@@ -130,8 +126,23 @@ namespace EU.Europa.EC.Markt.Dss.Signature.Cades
                 signedAttrs.Add(PkcsObjectIdentifiers.IdAAEtsSignerAttr, MakeSignerAttrAttribute
                     (parameters));
             }
+
+            List<SigPolicyQualifierInfo> url = new List<SigPolicyQualifierInfo>();
+            var sigQualifieer = new SigPolicyQualifierInfo(PkcsObjectIdentifiers.IdSpqEtsUri, new DerSet(new PolicyQualifierInfo("http://www.iti.gov.br/images/twiki/URL/pub/Certificacao/DocIcp/docs13082012/DOC-ICP-15.03_-_Versao_6.1.pdf")));
+            url.Add(sigQualifieer);
+
+
+            var sigPolicy = new SignaturePolicyIdentifier(
+                new SignaturePolicyId(new DerObjectIdentifier(parameters.SignaturePolicyID), new OtherHashAlgAndValue(new AlgorithmIdentifier
+                (DigestAlgorithm.GetByName(parameters.SignaturePolicyHashAlgo).GetOid()), new
+                DerOctetString(parameters.SignaturePolicyHashValue))));
+
+            var policy = new Attribute(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, new DerSet(sigPolicy
+                ));
+            signedAttrs.Add(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, policy);
+
             //signedAttrs.Add(PkcsObjectIdentifiers.IdSpqEtsUri, MakeSignerIdSpqEtsUriAttrAttribute("http://www.iti.gov.br/images/twiki/URL/pub/Certificacao/DocIcp/docs13082012/DOC-ICP-15.03_-_Versao_6.1.pdf"));
-            
+
             return signedAttrs;
         }
 

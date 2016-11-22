@@ -33,81 +33,81 @@ using System.Collections.Generic;
 
 namespace EU.Europa.EC.Markt.Dss.Signature.Cades
 {
-	/// <summary>
-	/// This class holds the CAdES-EPES signature profile; it supports the inclusion of the mandatory signed
-	/// id_aa_ets_sigPolicyId attribute as specified in ETSI TS 101 733 V1.8.1, clause 5.8.1.
-	/// </summary>
-	/// <remarks>
-	/// This class holds the CAdES-EPES signature profile; it supports the inclusion of the mandatory signed
-	/// id_aa_ets_sigPolicyId attribute as specified in ETSI TS 101 733 V1.8.1, clause 5.8.1.
-	/// </remarks>
-	/// <version>$Revision: 1887 $ - $Date: 2013-04-23 14:56:09 +0200 (mar., 23 avr. 2013) $
-	/// 	</version>
-	public class CAdESProfileEPES : CAdESProfileBES
-	{
-		/// <summary>The default constructor for CAdESProfileEPES.</summary>
-		/// <remarks>The default constructor for CAdESProfileEPES.</remarks>
-		public CAdESProfileEPES()
-		{
-		}
+    /// <summary>
+    /// This class holds the CAdES-EPES signature profile; it supports the inclusion of the mandatory signed
+    /// id_aa_ets_sigPolicyId attribute as specified in ETSI TS 101 733 V1.8.1, clause 5.8.1.
+    /// </summary>
+    /// <remarks>
+    /// This class holds the CAdES-EPES signature profile; it supports the inclusion of the mandatory signed
+    /// id_aa_ets_sigPolicyId attribute as specified in ETSI TS 101 733 V1.8.1, clause 5.8.1.
+    /// </remarks>
+    /// <version>$Revision: 1887 $ - $Date: 2013-04-23 14:56:09 +0200 (mar., 23 avr. 2013) $
+    /// 	</version>
+    public class CAdESProfileEPES : CAdESProfileBES
+    {
+        /// <summary>The default constructor for CAdESProfileEPES.</summary>
+        /// <remarks>The default constructor for CAdESProfileEPES.</remarks>
+        public CAdESProfileEPES()
+        {
+        }
 
-		/// <summary>The default constructor for CAdESProfileEPES.</summary>
-		/// <remarks>The default constructor for CAdESProfileEPES.</remarks>
-		public CAdESProfileEPES(bool padesUsage) : base(padesUsage)
-		{
-		}
+        /// <summary>The default constructor for CAdESProfileEPES.</summary>
+        /// <remarks>The default constructor for CAdESProfileEPES.</remarks>
+        public CAdESProfileEPES(bool padesUsage) : base(padesUsage)
+        {
+        }
 
-		//internal override IDictionary<DerObjectIdentifier, Asn1Encodable> GetSignedAttributes
+        //internal override IDictionary<DerObjectIdentifier, Asn1Encodable> GetSignedAttributes
         internal override IDictionary GetSignedAttributes
-			(SignatureParameters parameters)
-		{
-			try
-			{
-				//IDictionary<DerObjectIdentifier, Asn1Encodable> signedAttrs = base.GetSignedAttributes(parameters);
+            (SignatureParameters parameters)
+        {
+            try
+            {
+                //IDictionary<DerObjectIdentifier, Asn1Encodable> signedAttrs = base.GetSignedAttributes(parameters);
                 IDictionary signedAttrs = base.GetSignedAttributes(parameters);
-				Attribute policy = null;
-				SignaturePolicyIdentifier sigPolicy = null;
-				switch (parameters.SignaturePolicy)
-				{
-					case SignaturePolicy.EXPLICIT:
-					{
+                Attribute policy = null;
+                SignaturePolicyIdentifier sigPolicy = null;
+                switch (parameters.SignaturePolicy)
+                {
+                    case SignaturePolicy.EXPLICIT:
+                        {
                             List<SigPolicyQualifierInfo> url = new List<SigPolicyQualifierInfo>();
-                            var sigQualifieer = new SigPolicyQualifierInfo(PkcsObjectIdentifiers.IdSpqEtsUri, new DerSet(new PolicyQualifierInfo("http://www.iti.gov.br/images/twiki/URL/pub/Certificacao/DocIcp/docs13082012/DOC-ICP-15.03_-_Versao_6.1.pdf")));                                
+                            var sigQualifieer = new SigPolicyQualifierInfo(PkcsObjectIdentifiers.IdSpqEtsUri, new DerSet(new PolicyQualifierInfo("http://www.iti.gov.br/images/twiki/URL/pub/Certificacao/DocIcp/docs13082012/DOC-ICP-15.03_-_Versao_6.1.pdf")));
                             url.Add(sigQualifieer);
 
 
-                        sigPolicy = new SignaturePolicyIdentifier(
-                            new SignaturePolicyId(new DerObjectIdentifier (parameters.SignaturePolicyID), new OtherHashAlgAndValue(new AlgorithmIdentifier
-							(DigestAlgorithm.GetByName(parameters.SignaturePolicyHashAlgo).GetOid()), new 
-							DerOctetString(parameters.SignaturePolicyHashValue))));
+                            sigPolicy = new SignaturePolicyIdentifier(
+                                new SignaturePolicyId(new DerObjectIdentifier(parameters.SignaturePolicyID), new OtherHashAlgAndValue(new AlgorithmIdentifier
+                                (DigestAlgorithm.GetByName(parameters.SignaturePolicyHashAlgo).GetOid()), new
+                                DerOctetString(parameters.SignaturePolicyHashValue))));
 
-						policy = new Attribute(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, new DerSet(sigPolicy
-							));
-						signedAttrs.Add(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, policy);
-						break;
-					}
+                            policy = new Attribute(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, new DerSet(sigPolicy
+                                ));
+                            signedAttrs.Add(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, policy);
+                            break;
+                        }
 
-					case SignaturePolicy.IMPLICIT:
-					{
-						sigPolicy = new SignaturePolicyIdentifier();
-						//sigPolicy.IsSignaturePolicyImplied(); TODO jbonilla - validar
-						policy = new Attribute(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, new DerSet(sigPolicy
-							));
-						signedAttrs.Add(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, policy);
-						break;
-					}
+                    case SignaturePolicy.IMPLICIT:
+                        {
+                            sigPolicy = new SignaturePolicyIdentifier();
+                            //sigPolicy.IsSignaturePolicyImplied(); TODO jbonilla - validar
+                            policy = new Attribute(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, new DerSet(sigPolicy
+                                ));
+                            signedAttrs.Add(PkcsObjectIdentifiers.IdAAEtsSigPolicyID, policy);
+                            break;
+                        }
 
-					case SignaturePolicy.NO_POLICY:
-					{
-						break;
-					}
-				}
-				return signedAttrs;
-			}
-			catch (NoSuchAlgorithmException ex)
-			{
-				throw new ProfileException(ex.Message);
-			}
-		}
-	}
+                    case SignaturePolicy.NO_POLICY:
+                        {
+                            break;
+                        }
+                }
+                return signedAttrs;
+            }
+            catch (NoSuchAlgorithmException ex)
+            {
+                throw new ProfileException(ex.Message);
+            }
+        }
+    }
 }

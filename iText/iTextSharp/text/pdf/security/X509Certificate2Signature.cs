@@ -51,9 +51,9 @@ namespace iTextSharp.text.pdf.security {
                 RSACryptoServiceProvider rsaClear = new RSACryptoServiceProvider();
                                 
                 // Export RSA parameters from 'rsa' and import them into 'rsaClear'
-                rsaClear.ImportParameters(rsa.ExportParameters(true));
-                var teste = CryptoConfig.MapNameToOID("SHA256");                
-                return rsaClear.SignData(message, teste);
+                //rsaClear.ImportParameters(rsa.ExportParameters(true));
+                //var teste = CryptoConfig.MapNameToOID("SHA256");                
+                return rsa.SignData(message, CryptoConfig.CreateFromName("SHA256"));
             }
             else {
                 DSACryptoServiceProvider dsa = (DSACryptoServiceProvider)certificate.PrivateKey;

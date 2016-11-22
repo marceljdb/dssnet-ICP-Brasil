@@ -49,6 +49,9 @@ namespace EU.Europa.EC.Markt.Dss.Signature.Cades
     /// 	</version>
     public class CAdESService : DocumentSignatureService
     {
+
+        public byte[] contentBytes;
+
         private static readonly ILogger LOG = LoggerFactory.GetLogger(typeof(EU.Europa.EC.Markt.Dss.Signature.Cades.CAdESService
             ).FullName);
 
@@ -155,8 +158,7 @@ namespace EU.Europa.EC.Markt.Dss.Signature.Cades
             try
             {
                 digestValue = DigestUtilities.CalculateDigest
-                    (parameters.DigestAlgorithm.GetName(),
-                    Streams.ReadAll(ToBeSigned(document, parameters)));
+                    (parameters.DigestAlgorithm.GetName(),contentBytes);
                 return new EU.Europa.EC.Markt.Dss.Digest(parameters.DigestAlgorithm, digestValue
                     );
             }
@@ -175,21 +177,12 @@ namespace EU.Europa.EC.Markt.Dss.Signature.Cades
             {
                 throw new ArgumentException("Unsupported signature packaging " + parameters.SignaturePackaging);
             }
-            //jbonilla - No aplica para C#
-            //SignatureInterceptorProvider provider = new SignatureInterceptorProvider();
-            //Security.AddProvider(provider);
-            //string jsAlgorithm = parameters.GetSignatureAlgorithm().GetJavaSignatureAlgorithm
-            //    (parameters.GetDigestAlgorithm());
-            //PreComputedContentSigner contentSigner = new PreComputedContentSigner(jsAlgorithm
-            //    );
-            PreComputedSigner signer = new PreComputedSigner();
-            //CmsSignedDataGenerator generator = CreateCMSSignedDataGenerator(contentSigner, digestCalculatorProvider
-            //    , parameters, GetSigningProfile(parameters), false, null);
+             PreComputedSigner signer = new PreComputedSigner();
             CmsSignedDataGenerator generator = CreateCMSSignedDataGenerator
                 (signer, parameters, GetSigningProfile(parameters), false, null);
 
-            byte[] toBeSigned = Streams.ReadAll(document.OpenStream());
-            CmsProcessableByteArray content = new CmsProcessableByteArray(toBeSigned);
+            //byte[] toBeSigned = Streams.ReadAll(document.OpenStream());
+            CmsProcessableByteArray content = new CmsProcessableByteArray(contentBytes);
             try
             {
                 bool includeContent = true;
@@ -199,9 +192,7 @@ namespace EU.Europa.EC.Markt.Dss.Signature.Cades
                 }
                 CmsSignedData signed = generator.Generate(content, includeContent);
 
-                //jbonilla - El ISigner devuelve el mismo hash sin firmar para permitir
-                //la generación de la firma por un medio externo, como un token.
-                /*return new ByteArrayInputStream(contentSigner.GetByteOutputStream().ToByteArray());*/
+            
                 return new MemoryStream(signer.CurrentSignature());
             }
             catch (CmsException e)
@@ -222,21 +213,12 @@ namespace EU.Europa.EC.Markt.Dss.Signature.Cades
             }
             try
             {
-                //jbonilla - No aplica para C#
-                //string jsAlgorithm = parameters.GetSignatureAlgorithm().GetJavaSignatureAlgorithm
-                //    (parameters.GetDigestAlgorithm());
-                //PreComputedContentSigner cs = new PreComputedContentSigner(jsAlgorithm, signatureValue
-                //    );
                 PreComputedSigner s = new PreComputedSigner(signatureValue);
 
-                //DigestCalculatorProvider digestCalculatorProvider = new BcDigestCalculatorProvider
-                //    ();
-                //CMSSignedDataGenerator generator = CreateCMSSignedDataGenerator(cs, digestCalculatorProvider
-                //    , parameters, GetSigningProfile(parameters), true, null);
                 CmsSignedDataGenerator generator = CreateCMSSignedDataGenerator(s, parameters
                     , GetSigningProfile(parameters), true, null);
-                byte[] toBeSigned = Streams.ReadAll(document.OpenStream());
-                CmsProcessableByteArray content = new CmsProcessableByteArray(toBeSigned);
+                
+                CmsProcessableByteArray content = new CmsProcessableByteArray(contentBytes);
                 bool includeContent = true;
                 if (parameters.SignaturePackaging == SignaturePackaging.DETACHED)
                 {

@@ -8,6 +8,7 @@ using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities.IO;
 using Org.BouncyCastle.X509;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace teste
         {
             // Access Personal (MY) certificate store of current user
             var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadWrite);
+            store.Open(OpenFlags.MaxAllowed);
 
             // Find the certificate we'll use to sign            
             X509Certificate2 certificate = null;
@@ -65,8 +66,8 @@ namespace teste
             var service = new CAdESService();
 
             // Creation of MS CAPI signature token
-            var cert = new X509Certificate2(); //GetCertificate("47199695004");
-            cert.Import(@"Resources\Certificado DEMOLINER E CIA LTDA.p12","renan2", System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.Exportable);
+            var cert = GetCertificate("47199695004");
+            //cert.Import(@"Resources\Certificado DEMOLINER E CIA LTDA.p12","renan2", System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.Exportable);
             var token = new MSCAPISignatureToken { Cert = cert };
 
 
@@ -74,23 +75,20 @@ namespace teste
 
             //String privateKeyFileName = "C:\\myPrivateKey.der";
             //Path path = Path.getget(privateKeyFileName);
-            byte[] privKeyByteArray = File.ReadAllBytes(@"Resources\PA_AD_RB_v2_1.der");
-            var priv = Asn1Object.FromByteArray(privKeyByteArray);
-            
-//            var privStruct = new RsaPrivateKeyStructure((Asn1Sequence)priv);
-
-            var sequence = (Asn1Sequence)priv;
-
-            var encodable = (Asn1Encodable)sequence[2];
-            
+            //    byte[] privKeyByteArray = File.ReadAllBytes(@"Resources\PA_AD_RB_v2_1.der");
+            //  var priv = Asn1Object.FromByteArray(privKeyByteArray);           
+            //            var privStruct = new RsaPrivateKeyStructure((Asn1Sequence)priv);
+            //var sequence = (Asn1Sequence)priv;
+            //var encodable = (Asn1Encodable)sequence[2];
+            //var testeString = ((Org.BouncyCastle.Asn1.Asn1OctetString)encodable).GetOctets();
+            //var teste = Encoding.ASCII.GetBytes(encodable.ToString());
             var value = new byte[] { 221, 87, 201, 138, 67, 19, 188, 19, 152, 206, 101, 67, 211, 128, 36, 88, 149, 124, 247, 22, 174, 50, 148, 236, 77, 140, 38, 37, 18, 145, 230, 193 };
             
-            byte[] hash = DigestUtilities.CalculateDigest("SHA256", priv.GetDerEncoded()); // File.ReadAllBytes(@"Resources\PA_AD_RB_v2_1.der")); //:\ certBouncy.CertificateStructure.SubjectPublicKeyInfo.GetDerEncoded());
             //URL Verificador - https://verificador.iti.gov.br/verificador.xhtml
             var parameters = new SignatureParameters
             {
                 SignatureAlgorithm = SignatureAlgorithm.RSA,
-                SignatureFormat = SignatureFormat.CAdES_EPES,
+                SignatureFormat = SignatureFormat.CAdES_BES,
                 DigestAlgorithm = DigestAlgorithm.SHA256,
                 SignaturePackaging = SignaturePackaging.ENVELOPING,
                 SigningCertificate = certBouncy,
@@ -104,13 +102,14 @@ namespace teste
             
 
             var toBeSigned = new FileDocument(@"Resources\teste.pdf");
-
-            var iStream = service.ToBeSigned(toBeSigned, parameters);
+            var bytes = Streams.ReadAll(toBeSigned.OpenStream());
+            service.contentBytes = bytes;
+            var iStream = service.ToBeSigned(new FileDocument(""), parameters);
 
             var signatureValue = token.Sign(iStream, parameters.DigestAlgorithm, token.GetKeys()[0]);
             var dest = @"Resources\teste.p7s";
 
-            var signedDocument = service.SignDocument(toBeSigned, parameters, signatureValue);            
+            var signedDocument = service.SignDocument(new FileDocument(""), parameters, signatureValue);            
 
             if (File.Exists(dest)) File.Delete(dest);
             var fout = File.OpenWrite(dest);
