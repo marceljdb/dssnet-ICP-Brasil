@@ -82,7 +82,7 @@ namespace teste
             var sequence = (Asn1Sequence)priv;
 
             var encodable = (Asn1Encodable)sequence[2];
-
+            
             var value = new byte[] { 221, 87, 201, 138, 67, 19, 188, 19, 152, 206, 101, 67, 211, 128, 36, 88, 149, 124, 247, 22, 174, 50, 148, 236, 77, 140, 38, 37, 18, 145, 230, 193 };
             
             byte[] hash = DigestUtilities.CalculateDigest("SHA256", priv.GetDerEncoded()); // File.ReadAllBytes(@"Resources\PA_AD_RB_v2_1.der")); //:\ certBouncy.CertificateStructure.SubjectPublicKeyInfo.GetDerEncoded());
