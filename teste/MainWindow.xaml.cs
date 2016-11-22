@@ -2,8 +2,11 @@
 using EU.Europa.EC.Markt.Dss.Signature;
 using EU.Europa.EC.Markt.Dss.Signature.Cades;
 using EU.Europa.EC.Markt.Dss.Signature.Token;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 using System;
@@ -69,8 +72,20 @@ namespace teste
 
             var certBouncy = DotNetUtilities.FromX509Certificate(token.Cert);
 
+            //String privateKeyFileName = "C:\\myPrivateKey.der";
+            //Path path = Path.getget(privateKeyFileName);
+            byte[] privKeyByteArray = File.ReadAllBytes(@"Resources\PA_AD_RB_v2_1.der");
+            var priv = Asn1Object.FromByteArray(privKeyByteArray);
+            
+//            var privStruct = new RsaPrivateKeyStructure((Asn1Sequence)priv);
 
-            byte[] hash = DigestUtilities.CalculateDigest("SHA256", cert.Extensions[1].RawData); // File.ReadAllBytes(@"Resources\PA_AD_RB_v2_1.der")); //:\ certBouncy.CertificateStructure.SubjectPublicKeyInfo.GetDerEncoded());
+            var sequence = (Asn1Sequence)priv;
+
+            var encodable = (Asn1Encodable)sequence[2];
+
+            var value = new byte[] { 221, 87, 201, 138, 67, 19, 188, 19, 152, 206, 101, 67, 211, 128, 36, 88, 149, 124, 247, 22, 174, 50, 148, 236, 77, 140, 38, 37, 18, 145, 230, 193 };
+            
+            byte[] hash = DigestUtilities.CalculateDigest("SHA256", priv.GetDerEncoded()); // File.ReadAllBytes(@"Resources\PA_AD_RB_v2_1.der")); //:\ certBouncy.CertificateStructure.SubjectPublicKeyInfo.GetDerEncoded());
             //URL Verificador - https://verificador.iti.gov.br/verificador.xhtml
             var parameters = new SignatureParameters
             {
@@ -81,7 +96,7 @@ namespace teste
                 SigningCertificate = certBouncy,
                 SigningDate = DateTime.UtcNow,
                 SignaturePolicy = SignaturePolicy.EXPLICIT,
-                SignaturePolicyHashValue = cert.Extensions[1].RawData,
+                SignaturePolicyHashValue = value, 
                 SignaturePolicyID = "2.16.76.1.7.1.1.2.1",
                 SignaturePolicyHashAlgo = "SHA-256"              
                          
