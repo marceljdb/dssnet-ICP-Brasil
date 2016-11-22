@@ -63,7 +63,7 @@ namespace teste
 
             // Creation of MS CAPI signature token
             var cert = new X509Certificate2(); //GetCertificate("47199695004");
-            cert.Import(@"C:\Users\marcel.bueno\Desktop\certificados\Demoliner\Certificado DEMOLINER E CIA LTDA.p12","renan2", System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.Exportable);
+            cert.Import(@"Resources\Certificado DEMOLINER E CIA LTDA.p12","renan2", System.Security.Cryptography.X509Certificates.X509KeyStorageFlags.Exportable);
             var token = new MSCAPISignatureToken { Cert = cert };
 
 
