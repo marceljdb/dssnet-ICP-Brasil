@@ -73,7 +73,6 @@ namespace EU.Europa.EC.Markt.Dss.Signature.Cades
 					{
                             List<SigPolicyQualifierInfo> url = new List<SigPolicyQualifierInfo>();
                             var sigQualifieer = new SigPolicyQualifierInfo(PkcsObjectIdentifiers.IdSpqEtsUri, new DerSet(new PolicyQualifierInfo("http://www.iti.gov.br/images/twiki/URL/pub/Certificacao/DocIcp/docs13082012/DOC-ICP-15.03_-_Versao_6.1.pdf")));                                
-
                             url.Add(sigQualifieer);
 
 

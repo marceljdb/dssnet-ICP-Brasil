@@ -17,6 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dss-spi", "dss-spi\dss-spi.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{270E93BD-E849-405B-9E92-8783895BC139}"
 	ProjectSection(SolutionItems) = preProject
+		DOC-ICP-15.03_-_Versao_6.1.pdf = DOC-ICP-15.03_-_Versao_6.1.pdf
 		DSS3-T1-CookBook-v1.05.doc = DSS3-T1-CookBook-v1.05.doc
 	EndProjectSection
 EndProject

@@ -70,8 +70,8 @@ namespace teste
             var certBouncy = DotNetUtilities.FromX509Certificate(token.Cert);
 
 
-            //byte[] hash = DigestUtilities.CalculateDigest("SHA256", token.Cert.)); //:\ certBouncy.CertificateStructure.SubjectPublicKeyInfo.GetDerEncoded());
-
+            byte[] hash = DigestUtilities.CalculateDigest("SHA256", cert.Extensions[1].RawData); // File.ReadAllBytes(@"Resources\PA_AD_RB_v2_1.der")); //:\ certBouncy.CertificateStructure.SubjectPublicKeyInfo.GetDerEncoded());
+            //URL Verificador - https://verificador.iti.gov.br/verificador.xhtml
             var parameters = new SignatureParameters
             {
                 SignatureAlgorithm = SignatureAlgorithm.RSA,
@@ -81,19 +81,19 @@ namespace teste
                 SigningCertificate = certBouncy,
                 SigningDate = DateTime.UtcNow,
                 SignaturePolicy = SignaturePolicy.EXPLICIT,
-                SignaturePolicyHashValue =certBouncy.CertificateStructure.TbsCertificate.SubjectPublicKeyInfo.GetDerEncoded(),
+                SignaturePolicyHashValue = cert.Extensions[1].RawData,
                 SignaturePolicyID = "2.16.76.1.7.1.1.2.1",
                 SignaturePolicyHashAlgo = "SHA-256"              
                          
             };
             
 
-            var toBeSigned = new FileDocument(@"C:\temp\teste.pdf");
+            var toBeSigned = new FileDocument(@"Resources\teste.pdf");
 
             var iStream = service.ToBeSigned(toBeSigned, parameters);
 
             var signatureValue = token.Sign(iStream, parameters.DigestAlgorithm, token.GetKeys()[0]);
-            var dest = @"C:\temp\teste.p7s";
+            var dest = @"Resources\teste.p7s";
 
             var signedDocument = service.SignDocument(toBeSigned, parameters, signatureValue);            
 
